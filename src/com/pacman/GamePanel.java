@@ -4,10 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.HashSet;
 
-public class GamePanel extends JPanel implements ActionListener {
-
+public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
 
     class Block{
@@ -19,6 +20,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
         int startX;
         int startY;
+        char direction='U';
+        int velocityX=0;
+        int velocityY=0;
 
         Block(Image image, int x, int y, int width, int height){
             this.image=image;
@@ -29,6 +33,27 @@ public class GamePanel extends JPanel implements ActionListener {
             this.startX=x;
             this.startY=y;
 
+        }
+
+        void updateDirection(char direction){
+            this.direction=direction;
+            updateVelocity();
+        }
+
+        void updateVelocity(){
+            if(this.direction=='U'){
+                this.velocityX=0;
+                this.velocityY=-tileSize/4;
+            }else if(this.direction=='D'){
+                this.velocityX=0;
+                this.velocityY=tileSize/4;
+            }else if(this.direction=='L'){
+                this.velocityX=-tileSize/4;
+                this.velocityY=0;
+            }else if(this.direction=='R'){
+                this.velocityX=tileSize/4;
+                this.velocityY=0;
+            }
         }
     }
 
@@ -86,6 +111,8 @@ public class GamePanel extends JPanel implements ActionListener {
     GamePanel(){
         setPreferredSize(new Dimension(boardWidth,boardHeight));
         setBackground(Color.BLACK);
+        addKeyListener(this);
+        setFocusable(true);
 
         //load images
         wallImage=new ImageIcon(getClass().getResource("./wall.png")).getImage();
@@ -102,6 +129,7 @@ public class GamePanel extends JPanel implements ActionListener {
         loadMap();
         //will call the actionPerformed method every 50ms, thus 1000/50=20 fps
         gameLoop=new Timer(50,this);
+        gameLoop.start();
 //        System.out.println(walls.size());
 //        System.out.println(foods.size());
 //        System.out.println(ghosts.size());
@@ -167,8 +195,35 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    public void move(){
+        pacman.x+=pacman.velocityX;
+        pacman.y+=pacman.velocityY;
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
+        move();
         repaint();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e) {}
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+       // System.out.println("KeyEvent: "+ e.getKeyCode());
+        if(e.getKeyCode()== KeyEvent.VK_UP){
+            pacman.updateDirection('U');
+        }else if(e.getKeyCode()== KeyEvent.VK_DOWN){
+            pacman.updateDirection('D');
+        }else if(e.getKeyCode()== KeyEvent.VK_LEFT){
+            pacman.updateDirection('L');
+        }else if(e.getKeyCode()== KeyEvent.VK_RIGHT){
+            pacman.updateDirection('R');
+        }
     }
 }

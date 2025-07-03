@@ -21,6 +21,7 @@ public class Pacman {
         GamePanel gamePanel=new GamePanel();
         frame.add(gamePanel);
         frame.pack();
+        frame.requestFocus();
         frame.setVisible(true);
 
     }
