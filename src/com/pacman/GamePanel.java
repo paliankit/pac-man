@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashSet;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
@@ -36,8 +37,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         void updateDirection(char direction){
+            char prevDirection=this.direction;
             this.direction=direction;
             updateVelocity();
+            this.x+=this.velocityX;
+            this.y+=this.velocityY;
+            for(Block wall: walls){
+                if(collision(this,wall)){
+                    this.x-=this.velocityX;
+                    this.y-=this.velocityY;
+                    this.direction=prevDirection;
+                    updateVelocity();
+                }
+            }
         }
 
         void updateVelocity(){
@@ -106,6 +118,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     Block pacman;
 
     Timer gameLoop;
+    char[] directions={'U','D','L','R'};
+    Random random =new Random();
 
 
     GamePanel(){
@@ -127,6 +141,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         pacmanRightImage=new ImageIcon(getClass().getResource("./pacmanRight.png")).getImage();
 
         loadMap();
+        for(Block ghost:ghosts){
+            char newDirection=directions[random.nextInt(4)];
+            ghost.updateDirection(newDirection);
+        }
         //will call the actionPerformed method every 50ms, thus 1000/50=20 fps
         gameLoop=new Timer(50,this);
         gameLoop.start();
@@ -199,6 +217,41 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         pacman.x+=pacman.velocityX;
         pacman.y+=pacman.velocityY;
 
+        //check  wall collisions
+        for(Block wall:walls){
+            if(collision(pacman,wall)){
+                pacman.x-=pacman.velocityX;
+                pacman.y-=pacman.velocityY;
+                break;
+            }
+        }
+
+        //check ghost collisions
+
+        for(Block ghost:ghosts){
+            if(ghost.y==tileSize*9 && ghost.direction!='U' && ghost.direction!='D'){
+                ghost.updateDirection('U');
+            }
+            ghost.x+=ghost.velocityX;
+            ghost.y+=ghost.velocityY;
+            for(Block wall:walls){
+                //will have to implement the teleport logic for the middle row
+                if(collision(ghost,wall) || ghost.x<=0 || ghost.x+ghost.width>=boardWidth){
+                    ghost.x-=ghost.velocityX;
+                    ghost.y-=ghost.velocityY;
+                    char newDirection=directions[random.nextInt(4)];
+                    ghost.updateDirection(newDirection);
+                }
+            }
+        }
+
+    }
+
+    public boolean collision(Block a, Block b){
+        return a.x<b.x +b.width &&
+               a.x+a.width>b.x &&
+               a.y<b.y+b.height &&
+               a.y+a.height>b.y;
     }
 
     @Override
@@ -224,6 +277,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             pacman.updateDirection('L');
         }else if(e.getKeyCode()== KeyEvent.VK_RIGHT){
             pacman.updateDirection('R');
+        }
+
+        if(pacman.direction=='U'){
+            pacman.image=pacmanUpImage;
+        }else if(pacman.direction=='D'){
+            pacman.image=pacmanDownImage;
+        }else if(pacman.direction=='L'){
+            pacman.image=pacmanLeftImage;
+        }else if(pacman.direction=='R'){
+            pacman.image=pacmanRightImage;
         }
     }
 }
