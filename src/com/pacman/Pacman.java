@@ -25,10 +25,17 @@ public class Pacman {
         frame.setVisible(true);
 
 
-        //things to improve later:
+        //feature to add/improve later:
         //1. movement is kind of laggy. have to check why it is behaving like this.
         //2. add sound
         //3. customize any other behaviour, if required
+        //4. add logic for power palet
+        //5. create new level
+        //6. teleport on the middle row
+        //7. pause the game on pressing 'P' key
+        //8. loading and ending screen( with score, high score(will have to check how to do this)
+        //9. improve ghost collision logic
+        //10. add extra score points for cherry etc.
 
     }
 }
