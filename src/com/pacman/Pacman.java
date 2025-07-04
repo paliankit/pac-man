@@ -24,5 +24,11 @@ public class Pacman {
         frame.requestFocus();
         frame.setVisible(true);
 
+
+        //things to improve later:
+        //1. movement is kind of laggy. have to check why it is behaving like this.
+        //2. add sound
+        //3. customize any other behaviour, if required
+
     }
 }
