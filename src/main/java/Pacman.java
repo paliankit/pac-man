@@ -1,4 +1,4 @@
-package com.pacman;
+package main.java;
 
 import javax.swing.*;
 
